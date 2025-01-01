@@ -1,4 +1,4 @@
-@Library('Shared')_
+
 pipeline{
     agent { label 'dev-server'}
     
@@ -6,7 +6,7 @@ pipeline{
         stage("Code clone"){
             steps{
                 sh "whoami"
-            clone("https://github.com/LondheShubham153/django-notes-app.git","main")
+            clone("https://github.com/varikuppalahemanth/django-notes-app.git","main")
             }
         }
         stage("Code Build"){
