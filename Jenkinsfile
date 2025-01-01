@@ -1,4 +1,3 @@
-
 pipeline{
     agent any
     
@@ -6,22 +5,31 @@ pipeline{
         stage("Code clone"){
             steps{
                 sh "whoami"
-            clone("https://github.com/varikuppalahemanth/django-notes-app.git","main")
+                git url:"https://github.com/varikuppalahemanth/django-notes-app.git",branch:"main"
+            
             }
         }
         stage("Code Build"){
             steps{
-            dockerbuild("notes-app","latest")
+                sh "docker build -t my-notes-app ."
+            
             }
         }
         stage("Push to DockerHub"){
             steps{
-                dockerpush("dockerHubCreds","notes-app","latest")
+                withCredentials([usernamePassword(credentialsId:"DockerKey",usernameVariable:"dockerHubuser",passwordVariable:"dockerHubpass")]){
+                    sh "docker tag my-notes-app ${env.dockerHubuser}/my-notes-app:latest"
+                    sh "docker login -u ${env.dockerHubuser} -p ${env.dockerHubpass}"
+                    sh "docker push ${env.dockerHubuser}/my-notes-app:latest"
+                }
+                
+                
             }
         }
         stage("Deploy"){
             steps{
-                deploy()
+                sh "docker run -d -p 8000:8000 hemanth123456789/my-notes-app:latest"
+                
             }
         }
         
